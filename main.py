@@ -13,15 +13,16 @@ import os
 import openai
 
 load_dotenv()  # load .env file
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise ValueError("OPENAI_API_KEY not found in environment variables or .env file")
-
-# Create OpenAI client
-client = openai.OpenAI(api_key=api_key)
-
 # Demo mode - set to True to use mock data instead of OpenAI API
 DEMO_MODE = os.getenv("DEMO_MODE", "false").lower() == "true"
+api_key = os.getenv("OPENAI_API_KEY")
+
+# Create OpenAI client only when not in demo mode
+client = None
+if not DEMO_MODE:
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY not found in environment variables or .env file")
+    client = openai.OpenAI(api_key=api_key)
 
 # Skills database for keyword matching
 HARD_SKILLS_DB = {
@@ -316,6 +317,9 @@ def analyze_with_llm(resume_text, jd_text):
     - Ensure the match percentage accurately reflects the overlap, but emphasize potential and progress.
     - Cover all aspects of the job description thoroughly in the analysis.
     """
+
+    if client is None:
+        raise HTTPException(status_code=500, detail="OpenAI client is not configured. Set OPENAI_API_KEY or enable DEMO_MODE=true.")
 
     try:
         response = client.chat.completions.create(
