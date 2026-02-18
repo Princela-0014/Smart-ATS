@@ -1,0 +1,734 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart ATS Analyzer</title>
+    <link rel="icon" href="data:,">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            padding: 50px;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1em;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            transition: all 0.3s ease;
+            min-height: 200px;
+            color: #333;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background-color: #f8f9ff;
+        }
+        
+        textarea::placeholder {
+            color: #999;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            background-color: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #667eea;
+            font-weight: 600;
+            font-size: 1.05em;
+        }
+        
+        .file-input-label:hover {
+            background-color: #f0f2ff;
+            border-color: #764ba2;
+            color: #764ba2;
+        }
+        
+        .file-input-label svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        
+        .file-name {
+            margin-top: 12px;
+            color: #666;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+        
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 50px;
+            padding-top: 40px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .feature-item h3 {
+            font-size: 0.95em;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .feature-item p {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .header p {
+                font-size: 0.95em;
+            }
+            
+            .file-input-label {
+                padding: 30px 20px;
+                font-size: 0.95em;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Results Container Styles */
+        .results-container {
+            animation: slideDown 0.6s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+        
+        .results-header h2 {
+            color: #333;
+            font-size: 1.8em;
+            margin: 0;
+        }
+        
+        .reset-btn {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            color: #333;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            box-shadow: none;
+        }
+        
+        .reset-btn:hover {
+            background-color: #e0e0e0;
+            border-color: #999;
+        }
+        
+        .result-card {
+            background: #f8f9ff;
+            border: 2px solid #e8e8f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        .match-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px solid #667eea;
+            text-align: center;
+        }
+        
+        .result-card h3 {
+            color: #333;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            margin-top: 0;
+        }
+        
+        .match-score {
+            font-size: 3em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .skill-tag {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+        
+        .skill-tag.matched {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%) !important;
+        }
+        
+        .skill-tag.variation {
+            background: linear-gradient(135deg, #ffeb3b 0%, #fbc02d 100%) !important;
+            color: #333 !important;
+        }
+        
+        .skill-tag.missing {
+            background: #ffe8e8 !important;
+            color: #c83b4a !important;
+            border-left: 3px solid #c83b4a !important;
+        }
+        
+        .keywords-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .keyword-tag {
+            display: inline-block;
+            background: #ffe8e8;
+            color: #c83b4a;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            border-left: 3px solid #c83b4a;
+        }
+        
+        .missing-card {
+            background: #fff5f5;
+            border: 2px solid #ffcccc;
+        }
+        
+        .suggestions-card {
+            background: linear-gradient(135deg, #e8f5e915 0%, #fff9c415 100%);
+            border: 2px solid #f0d170;
+        }
+        
+        .suggestions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .suggestion-item {
+            padding: 12px 15px;
+            background: white;
+            border-left: 4px solid #f0d170;
+            border-radius: 4px;
+            font-size: 0.95em;
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .suggestion-item strong {
+            color: #667eea;
+        }
+        
+        .summary-text {
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
+            font-size: 0.95em;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            font-size: 0.95em;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 6px;
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: #333;
+        }
+        
+        .spinner {
+            border: 4px solid #f0f0f0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📄 Smart ATS Analyzer</h1>
+            <p>Match your resume with job descriptions instantly</p>
+        </div>
+        
+        <form id="analysisForm" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="jd">📋 Job Description</label>
+                <textarea id="jd" name="jd" placeholder="Paste the job description here... (e.g., copy from job posting)"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="resume">📎 Upload Resume (PDF)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="resume" name="resume" accept=".pdf" onchange="updateFileName(this)">
+                    <label for="resume" class="file-input-label">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm4 2a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H7a1 1 0 01-1-1V8z"/>
+                        </svg>
+                        Click to upload or drag & drop your PDF
+                    </label>
+                    <div class="file-name" id="fileName"></div>
+                </div>
+            </div>
+            
+            <button type="button" id="analyzeBtn">✨ Analyze Resume</button>
+        </form>
+        
+        <div id="resultsContainer" class="results-container" style="display: none;">
+            <div class="results-header">
+                <h2>📊 Analysis Results</h2>
+                <button type="button" class="reset-btn" onclick="resetForm()">← Start Over</button>
+            </div>
+            
+            <div class="result-card">
+                <h3>📄 PDF Parse Quality</h3>
+                <p id="parseQuality" class="summary-text"></p>
+            </div>
+            
+            <div class="result-card match-card">
+                <h3>🎯 JD Match</h3>
+                <div class="match-score" id="matchScore">0%</div>
+            </div>
+            
+            <div class="result-card">
+                <h3>✓ Matched Skills</h3>
+                <div id="matchedSkills" class="skills-container"></div>
+            </div>
+            
+            <div class="result-card">
+                <h3>💼 Your Hard Skills</h3>
+                <div id="hardSkills" class="skills-container"></div>
+            </div>
+            
+            <div class="result-card">
+                <h3>🤝 Your Soft Skills</h3>
+                <div id="softSkills" class="skills-container"></div>
+            </div>
+            
+            <div class="result-card missing-card">
+                <h3>🔑 Missing Technical Skills</h3>
+                <div id="missingKeywords" class="keywords-container"></div>
+            </div>
+            
+            <div class="result-card missing-card">
+                <h3>💬 Missing Soft Skills</h3>
+                <div id="missingSoftSkills" class="keywords-container"></div>
+            </div>
+            
+            <div class="result-card">
+                <h3>📝 Detailed Summary</h3>
+                <p id="profileSummary" class="summary-text"></p>
+            </div>
+            
+            <div class="result-card suggestions-card">
+                <h3>💡 How to Improve Your Match</h3>
+                <div id="suggestions" class="suggestions-list"></div>
+            </div>
+        </div>
+        
+        <div id="loadingSpinner" class="loading-spinner" style="display: none;">
+            <div class="spinner"></div>
+            <p>Analyzing your resume...</p>
+        </div>
+        
+        <div class="features" id="featuresSection">
+            <div class="feature-item">
+                <div class="feature-icon">⚡</div>
+                <h3>Instant Analysis</h3>
+                <p>Get results in seconds</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎯</div>
+                <h3>Match Score</h3>
+                <p>See JD alignment</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔍</div>
+                <h3>Skill Categorization</h3>
+                <p>Hard & soft skills</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function updateFileName(input) {
+            const fileName = input.files[0]?.name || '';
+            document.getElementById('fileName').textContent = fileName ? `✓ Selected: ${fileName}` : '';
+        }
+        
+        function resetForm() {
+            document.getElementById('analysisForm').reset();
+            document.getElementById('fileName').textContent = '';
+            document.getElementById('analysisForm').style.display = 'block';
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('featuresSection').style.display = 'grid';
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+        
+        document.getElementById('analyzeBtn').addEventListener('click', async () => {
+            alert('Button clicked - JS is working');
+            console.log('Analyze button clicked');
+            
+            const jd = document.getElementById('jd').value.trim();
+            const resumeFile = document.getElementById('resume').files[0];
+            
+            if (!jd) {
+                alert('Please paste a job description.');
+                return;
+            }
+            
+            if (!resumeFile) {
+                alert('Please upload a resume PDF.');
+                return;
+            }
+            
+            if (!resumeFile.name.toLowerCase().endsWith('.pdf')) {
+                alert('Please upload a PDF file.');
+                return;
+            }
+            
+            // Show loading spinner
+            document.getElementById('loadingSpinner').style.display = 'flex';
+            document.getElementById('featuresSection').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'none';
+            
+            try {
+                const formData = new FormData();
+                formData.append('jd', jd);
+                formData.append('resume', resumeFile);
+                
+                const response = await fetch('/analyze/', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Analysis failed');
+                }
+                
+                const results = await response.json();
+                console.log('Response received:', results);
+                
+                // Hide loading spinner
+                document.getElementById('loadingSpinner').style.display = 'none';
+                
+                try {
+                    // Display results
+                    displayResults(results);
+                } catch (error) {
+                    console.error('Error in displayResults:', error);
+                    alert('Error displaying results: ' + error.message);
+                }
+                
+            } catch (error) {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                alert(`Error: ${error.message}`);
+            }
+        });
+        
+        function displayResults(results) {
+            console.log('displayResults called');
+            console.log('Results:', results);
+            // Display PDF parse quality
+            const parseQuality = results['Parse Quality'] ||
+                (results['Profile Summary']?.includes('Easy to parse') ? 'Easy to parse - The PDF contains sufficient text for accurate analysis.' :
+                (results['Profile Summary']?.includes('Hard to parse') ? 'Hard to parse - The PDF may be image-based, scanned, or contain minimal text. Consider using a text-based PDF for better analysis.' :
+                'Parse quality unavailable.'));
+            document.getElementById('parseQuality').textContent = parseQuality;
+
+            // Set match score
+            const matchScore = results['JD Match'] || '0%';
+            document.getElementById('matchScore').textContent = matchScore;
+            
+            // Get matched skills
+            const matchedSkills = results['Matched Skills'] || [];
+            
+            // Display matched skills
+            const matchedSkillsContainer = document.getElementById('matchedSkills');
+            if (matchedSkills.length > 0) {
+                matchedSkillsContainer.innerHTML = matchedSkills
+                    .map(skill => `<span class="skill-tag matched">${escapeHtml(skill)}</span>`)
+                    .join('');
+            } else {
+                matchedSkillsContainer.innerHTML = '<div class="empty-state">No matched skills found - focus on learning the required skills</div>';
+            }
+            
+            // Display hard skills
+            const hardSkills = results['Hard Skills'] || [];
+            const missingKeywords = results['Missing Keywords'] || [];
+            const allHard = [...new Set([...hardSkills, ...missingKeywords.filter(k => k !== 'No critical missing skills')])];
+            const hardSkillsContainer = document.getElementById('hardSkills');
+            if (allHard.length > 0) {
+                hardSkillsContainer.innerHTML = allHard
+                    .map(skill => {
+                        let className = 'skill-tag';
+                        if (matchedSkills.includes(skill)) {
+                            className += ' matched';
+                        } else if (hardSkills.includes(skill)) {
+                            className += ' variation';
+                        } else {
+                            className += ' missing';
+                        }
+                        return `<span class="${className}">${escapeHtml(skill)}</span>`;
+                    })
+                    .join('');
+            } else {
+                hardSkillsContainer.innerHTML = '<div class="empty-state">Consider adding technical skills to your resume</div>';
+            }
+            
+            // Display soft skills
+            const softSkills = results['Soft Skills'] || [];
+            const missingSoftSkills = results['Missing Soft Skills'] || [];
+            const allSoft = [...new Set([...softSkills, ...missingSoftSkills.filter(s => s !== 'Your soft skills are well-aligned')])];
+            const softSkillsContainer = document.getElementById('softSkills');
+            if (allSoft.length > 0) {
+                softSkillsContainer.innerHTML = allSoft
+                    .map(skill => {
+                        let className = 'skill-tag';
+                        if (matchedSkills.includes(skill)) {
+                            className += ' matched';
+                        } else if (softSkills.includes(skill)) {
+                            className += ' variation';
+                        } else {
+                            className += ' missing';
+                        }
+                        return `<span class="${className}">${escapeHtml(skill)}</span>`;
+                    })
+                    .join('');
+            } else {
+                softSkillsContainer.innerHTML = '<div class="empty-state">Highlight your soft skills in your professional summary</div>';
+            }
+            
+            // Display missing keywords
+            const missingKeywordsContainer = document.getElementById('missingKeywords');
+            if (missingKeywords.length > 0 && missingKeywords[0] !== 'No critical missing skills') {
+                missingKeywordsContainer.innerHTML = missingKeywords
+                    .map(keyword => `<span class="keyword-tag">${escapeHtml(keyword)}</span>`)
+                    .join('');
+            } else {
+                missingKeywordsContainer.innerHTML = '<div class="empty-state">✓ Great! No critical technical skills missing</div>';
+            }
+            
+            // Display missing soft skills
+            const missingSoftSkillsContainer = document.getElementById('missingSoftSkills');
+            if (missingSoftSkills.length > 0 && missingSoftSkills[0] !== 'Your soft skills are well-aligned') {
+                missingSoftSkillsContainer.innerHTML = missingSoftSkills
+                    .map(skill => `<span class="keyword-tag">${escapeHtml(skill)}</span>`)
+                    .join('');
+            } else {
+                missingSoftSkillsContainer.innerHTML = '<div class="empty-state">✓ Your soft skills are well-aligned with the job!</div>';
+            }
+            
+            // Display profile summary
+            const summary = results['Profile Summary'] || 'Analysis complete';
+            document.getElementById('profileSummary').textContent = summary;
+            
+            // Display suggestions
+            const suggestions = results['Suggestions for Improvement'] || [];
+            const suggestionsContainer = document.getElementById('suggestions');
+            if (suggestions.length > 0) {
+                suggestionsContainer.innerHTML = suggestions
+                    .map(suggestion => `<div class="suggestion-item">${escapeHtml(suggestion)}</div>`)
+                    .join('');
+            } else {
+                suggestionsContainer.innerHTML = '<div class="suggestion-item">Your resume is well-aligned with the job description. Good luck with your application!</div>';
+            }
+            
+            // Show results container and hide features
+            document.getElementById('analysisForm').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'block';
+            document.getElementById('featuresSection').style.display = 'none';
+            
+            // Scroll to results
+            document.getElementById('resultsContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
